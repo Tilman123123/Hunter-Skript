@@ -1,0 +1,7 @@
+{
+  "type": "loot",
+  "animations": [
+    {"name": "kneel_loot", "file": "kneel_loot.anim"},
+    {"name": "cut_animal", "file": "cut_animal.anim"}
+  ]
+}

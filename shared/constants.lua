@@ -1,0 +1,7 @@
+TRACKING_RADIUS = 50.0
+ANIMAL_REWARD = 250
+
+INTERACTION_KEY = 38 -- Standardmäßig die "E"-Taste
+
+HUNT_COOLDOWN = 30
+HUNT_REWARD_ITEM = "wild_meat"

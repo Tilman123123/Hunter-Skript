@@ -1,0 +1,9 @@
+{
+  "animal": "bear",
+  "animations": [
+    {"name": "walk", "file": "bear_walk.anim"},
+    {"name": "run", "file": "bear_run.anim"},
+    {"name": "attack", "file": "bear_attack.anim"},
+    {"name": "death", "file": "bear_death.anim"}
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "kneel": {
+    "dict": "missheistdockssetup1clipboard@base",
+    "name": "base",
+    "flag": 49
+  },
+  "cut": {
+    "dict": "melee@knife@streamed_core",
+    "name": "ground_attack_on_spot",
+    "flag": 49
+  }
+}

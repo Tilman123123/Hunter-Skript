@@ -1,0 +1,14 @@
+-- Gunshot Sound abspielen
+function playGunshotSound()
+    SendNUIMessage({
+        type = "playSound",
+        sound = "gunshot",
+        volume = 0.7
+    })
+end
+
+-- Beispiel: Wenn ein Tier getroffen wird
+RegisterNetEvent("hunter:playGunshot")
+AddEventHandler("hunter:playGunshot", function()
+    playGunshotSound()
+end)

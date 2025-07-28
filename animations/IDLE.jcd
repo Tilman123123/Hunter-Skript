@@ -1,0 +1,7 @@
+{
+  "type": "player_idle",
+  "animations": [
+    {"name": "idle_rifle", "file": "idle_rifle.anim"},
+    {"name": "aiming", "file": "idle_aim.anim"}
+  ]
+}

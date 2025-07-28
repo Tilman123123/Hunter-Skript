@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CVehicleModelInfo__InitDataList>
+    <InitDatas>
+        <!-- Hirsch -->
+        <Item>
+            <modelName>a_c_deer</modelName>
+            <txdName>a_c_deer</txdName>
+            <handlingId>NULL</handlingId>
+            <gameName>DEER</gameName>
+            <vehicleMakeName>NONE</vehicleMakeName>
+            <expressionDictName>null</expressionDictName>
+            <expressionName>null</expressionName>
+            <animConvDictName>null</animConvDictName>
+            <animConvName>null</animConvName>
+            <animConvSlotName>null</animConvSlotName>
+            <multiplayerOnly value="false"/>
+            <freighter value="false"/>
+            <buoy value="false"/>
+            <electric value="false"/>
+            <requiresSiren value="false"/>
+        </Item>
+
+        <!-- Wildschwein -->
+        <Item>
+            <modelName>a_c_boar</modelName>
+            <txdName>a_c_boar</txdName>
+            <handlingId>NULL</handlingId>
+            <gameName>BOAR</gameName>
+            <vehicleMakeName>NONE</vehicleMakeName>
+            <expressionDictName>null</expressionDictName>
+            <expressionName>null</expressionName>
+            <animConvDictName>null</animConvDictName>
+            <animConvName>null</animConvName>
+            <animConvSlotName>null</animConvSlotName>
+            <multiplayerOnly value="false"/>
+            <freighter value="false"/>
+            <buoy value="false"/>
+            <electric value="false"/>
+            <requiresSiren value="false"/>
+        </Item>
+
+        <!-- Bär -->
+        <Item>
+            <modelName>a_c_bear</modelName>
+            <txdName>a_c_bear</txdName>
+            <handlingId>NULL</handlingId>
+            <gameName>BEAR</gameName>
+            <vehicleMakeName>NONE</vehicleMakeName>
+            <expressionDictName>null</expressionDictName>
+            <expressionName>null</expressionName>
+            <animConvDictName>null</animConvDictName>
+            <animConvName>null</animConvName>
+            <animConvSlotName>null</animConvSlotName>
+            <multiplayerOnly value="false"/>
+            <freighter value="false"/>
+            <buoy value="false"/>
+            <electric value="false"/>
+            <requiresSiren value="false"/>
+        </Item>
+
+        <!-- Hase -->
+        <Item>
+            <modelName>a_c_rabbit_01</modelName>
+            <txdName>a_c_rabbit_01</txdName>
+            <handlingId>NULL</handlingId>
+            <gameName>RABBIT</gameName>
+            <vehicleMakeName>NONE</vehicleMakeName>
+            <expressionDictName>null</expressionDictName>
+            <expressionName>null</expressionName>
+            <animConvDictName>null</animConvDictName>
+            <animConvName>null</animConvName>
+            <animConvSlotName>null</animConvSlotName>
+            <multiplayerOnly value="false"/>
+            <freighter value="false"/>
+            <buoy value="false"/>
+            <electric value="false"/>
+            <requiresSiren value="false"/>
+        </Item>
+
+    </InitDatas>
+</CVehicleModelInfo__InitDataList>

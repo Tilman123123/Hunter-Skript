@@ -1,0 +1,24 @@
+-- Hintergrundmusik ein-/ausschalten
+local isThemePlaying = false
+
+function toggleHuntTheme()
+    if isThemePlaying then
+        SendNUIMessage({
+            type = "stopSound",
+            sound = "hunt_theme1"
+        })
+    else
+        SendNUIMessage({
+            type = "playSound",
+            sound = "hunt_theme1",
+            volume = 0.4,
+            loop = true
+        })
+    end
+    isThemePlaying = not isThemePlaying
+end
+
+-- Beispiel: Toggle per Befehl oder Trigger
+RegisterCommand("toggleTheme", function()
+    toggleHuntTheme()
+end, false)

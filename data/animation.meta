@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AnimationData>
+    <Entry>
+        <ID>hunt_anim_01</ID>
+        <Clip>hunt_kneel</Clip>
+        <Type>loop</Type>
+    </Entry>
+    <Entry>
+        <ID>hunt_anim_02</ID>
+        <Clip>hunt_cut</Clip>
+        <Type>once</Type>
+    </Entry>
+</AnimationData>

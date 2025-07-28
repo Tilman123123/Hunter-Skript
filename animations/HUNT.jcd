@@ -1,0 +1,8 @@
+{
+  "type": "player_hunt",
+  "animations": [
+    {"name": "walk_hunt", "file": "walk_hunt.anim"},
+    {"name": "crawl_hunt", "file": "crawl_hunt.anim"},
+    {"name": "aim_shoot", "file": "aim_shoot.anim"}
+  ]
+}

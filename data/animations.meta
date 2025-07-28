@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Animations>
+    <Animation>
+        <Name>hunt_kneel</Name>
+        <Dictionary>missheistdockssetup1clipboard@base</Dictionary>
+        <AnimationName>base</AnimationName>
+        <Flags>49</Flags>
+    </Animation>
+    <Animation>
+        <Name>hunt_cut</Name>
+        <Dictionary>melee@knife@streamed_core</Dictionary>
+        <AnimationName>ground_attack_on_spot</AnimationName>
+        <Flags>49</Flags>
+    </Animation>
+</Animations>

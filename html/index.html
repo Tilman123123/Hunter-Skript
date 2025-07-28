@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Jagdmenü</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="menu">
+    <h1>Jagdmenü</h1>
+    <button onclick="sellAnimal('hirsch')">Hirsch verkaufen</button>
+    <button onclick="sellAnimal('bär')">Bär verkaufen</button>
+    <button onclick="sellAnimal('wolf')">Wolf verkaufen</button>
+    <button onclick="closeMenu()">Menü schließen</button>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
+
+<div id="pointsDisplay" style="color: white; font-size: 24px; position: absolute; top: 10%; left: 5%;">
+    Punkte: 0
+</div>
+
+<button onclick="closeUI()" style="position: absolute; top: 5%; right: 5%;">X</button>
