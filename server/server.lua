@@ -15,7 +15,7 @@ RegisterNetEvent("hunter:server:logSell", function(item, price)
     print(("Player %s sold %s for $%s"):format(src, item, price))
 end)
 
--- Lade alle Missionen
+-- Missionen laden (falls verwendet)
 local missionFiles = {
     'server/missions/mission-01.lua',
     'server/missions/mission-02.lua',
@@ -48,16 +48,6 @@ RegisterNetEvent("hunter:animalKilled", function(animalType, reward, dropItem)
     end
 end)
 
-RegisterNetEvent("hunt:animalKilled")
-AddEventHandler("hunt:animalKilled", function(animalType)
-    LogEvent("Tier getötet", "Typ: " .. animalType)
-end)
-
-RegisterNetEvent("hunt:animalKilled")
-AddEventHandler("hunt:animalKilled", function(animalType)
-    LogEvent("Tier getötet", "Typ: " .. animalType)
-end)
-
 RegisterNetEvent("hunt:playSound")
 AddEventHandler("hunt:playSound", function(soundName)
     TriggerClientEvent("hunt:playClientSound", source, soundName)
@@ -67,12 +57,62 @@ RegisterCommand("startHunt", function(source)
     SpawnRandomAnimal()
 end, false)
 
-RegisterServerEvent("hunt:sellAnimal")
-AddEventHandler("hunt:sellAnimal", function(animalType)
+-- Verkauf einzelner Tiere
+RegisterServerEvent('hunter:sell')
+AddEventHandler('hunter:sell', function(animal)
     local src = source
-    local reward = HuntingRewards[animalType]
-    if reward then
-        -- Füge Geld & Item hinzu (Dummy-System)
-        print(("Player %s sold %s for $%s"):format(src, animalType, reward.money))
+    local price = 0
+
+    if animal == 'deer' then
+        price = 100
+    elseif animal == 'boar' then
+        price = 150
+    end
+
+    if price > 0 then
+        local xPlayer = ESX.GetPlayerFromId(src)
+        if xPlayer then
+            xPlayer.addMoney(price)
+            print(("Spieler %s hat %s verkauft und %s$ erhalten"):format(src, animal, price))
+        else
+            print(("[Fehler] Spieler %s konnte nicht über ESX geladen werden."):format(src))
+        end
+    else
+        print(("[Warnung] Tier %s hat keinen festgelegten Preis."):format(tostring(animal)))
+    end
+end)
+
+-- Verkauf aller gesammelten Items (Reh/Wildschwein)
+RegisterServerEvent('hunter:sellAll')
+AddEventHandler('hunter:sellAll', function()
+    local src = source
+    local xPlayer = ESX.GetPlayerFromId(src)
+    local total = 0
+
+    if xPlayer then
+        local deerCount = xPlayer.getInventoryItem('deer_pelt').count or 0
+        local boarCount = xPlayer.getInventoryItem('boar_pelt').count or 0
+
+        local deerPrice = 100
+        local boarPrice = 150
+
+        if deerCount > 0 then
+            total = total + (deerCount * deerPrice)
+            xPlayer.removeInventoryItem('deer_pelt', deerCount)
+        end
+
+        if boarCount > 0 then
+            total = total + (boarCount * boarPrice)
+            xPlayer.removeInventoryItem('boar_pelt', boarCount)
+        end
+
+        if total > 0 then
+            xPlayer.addMoney(total)
+            print(("Spieler %s hat alles verkauft und %s$ erhalten"):format(src, total))
+        else
+            print(("Spieler %s hatte nichts zu verkaufen"):format(src))
+        end
+    else
+        print("[Fehler] ESX-Spieler konnte nicht geladen werden.")
     end
 end)

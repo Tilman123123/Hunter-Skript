@@ -12,21 +12,18 @@ AddEventHandler("hunter:notify", function(msg)
     DrawNotification(false, true)
 end)
 
--- Wenn Spieler eine Jagdzone betritt
 AddEventHandler("hunter:enteredZone", function(zoneName)
     isInHuntingZone = true
     currentZone = zoneName
     TriggerEvent("hunter:notify", "Du hast das Jagdgebiet " .. zoneName .. " betreten.")
 end)
 
--- Wenn Spieler die Zone verlässt
 AddEventHandler("hunter:leftZone", function()
     isInHuntingZone = false
     currentZone = nil
     TriggerEvent("hunter:notify", "Du hast das Jagdgebiet verlassen.")
 end)
 
--- Interaktion mit erlegten Tieren
 RegisterCommand("sammeln", function()
     if isInHuntingZone then
         local ped = PlayerPedId()
@@ -46,73 +43,100 @@ RegisterCommand("sammeln", function()
     end
 end)
 
--- XP-System (vereinfachtes Beispiel)
 RegisterNetEvent("hunter:updateXP")
 AddEventHandler("hunter:updateXP", function(xp)
     playerXP = xp
     huntingLevel = math.floor(xp / 100) + 1
 end)
 
-TriggerServerEvent("hunter:giveReward", "deer")
-
--- Event bei Treffer eines Tiers (von target.lua ausgelöst)
 RegisterNetEvent("hunting:targetHit", function(animalType)
     if animalType == "deer" then
-        TriggerServerEvent("hunting:reward", "deer")
+        GrantLoot("deer")
         lib.notify({ title = "Jagd", description = "Du hast ein Reh getroffen!", type = "success" })
     elseif animalType == "boar" then
-        TriggerServerEvent("hunting:reward", "boar")
+        GrantLoot("boar")
         lib.notify({ title = "Jagd", description = "Du hast ein Wildschwein getroffen!", type = "success" })
     else
         lib.notify({ title = "Fehler", description = "Unbekanntes Tier getroffen.", type = "error" })
     end
 end)
 
-function NotifyServerOfKill(animalType, reward, dropItem)
-    TriggerServerEvent("hunter:animalKilled", animalType, reward, dropItem)
-end
+function GrantLoot(animalType)
+    local reward = 0
+    local item = nil
 
--- Beispiel: Nach einem Abschuss
-TriggerServerEvent("hunter:animalKilled", "deer", 150, "deer_pelt")
+    if animalType == "deer" then
+        reward = 100
+        item = "deer_pelt"
+    elseif animalType == "boar" then
+        reward = 150
+        item = "boar_pelt"
+    end
 
--- Nach Erfolg (z. B. beim Missionsende oder Tierabschuss)
-TriggerServerEvent("hunter:giveReward", "deer")
-
-function NotifyTrackFound(animal)
-    TriggerEvent("hunter:showTrackNotification", animal)
-    SendNUIMessage({ type = "showAnimalUI", animal = animal })
+    if item then
+        TriggerServerEvent("hunter:animalKilled", animalType, reward, item)
+    end
 end
 
 Citizen.CreateThread(function()
     while true do
         Citizen.Wait(0)
-        if IsPlayerNearAnimal() then
-            local animalCoords = GetTrackedAnimalCoords()
-            DrawAnimalMarker(animalCoords)
+        local player = PlayerPedId()
+        local coords = GetEntityCoords(player)
+        local dist = #(coords - vector3(-1085.3, 4947.4, 218.3))
+        if dist < 2.0 then
+            DrawText3D(-1085.3, 4947.4, 218.3, "[E] Tier verkaufen")
+            if IsControlJustReleased(0, 38) then
+                TriggerEvent("hunter:openMenu")
+            end
         end
     end
 end)
 
-RegisterCommand("sell", function()
-    -- Beispielverkauf (später über Target etc. automatisieren)
-    SellAnimal("a_c_deer")
-end, false)
+RegisterNetEvent("hunter:openMenu", function()
+    lib.registerContext({
+        id = 'hunter_sell_menu',
+        title = 'Jagdverkauf',
+        options = {
+            {
+                title = '🦌 Reh verkaufen',
+                description = 'Verkaufe ein Reh',
+                icon = 'paw',
+                onSelect = function()
+                    TriggerServerEvent('hunter:sell', 'deer')
+                end
+            },
+            {
+                title = '🐗 Wildschwein verkaufen',
+                description = 'Verkaufe ein Wildschwein',
+                icon = 'hippo',
+                onSelect = function()
+                    TriggerServerEvent('hunter:sell', 'boar')
+                end
+            },
+            {
+                title = '📦 Alles verkaufen',
+                description = 'Verkaufe dein gesamtes Jagdgut',
+                icon = 'box',
+                onSelect = function()
+                    TriggerServerEvent('hunter:sellAll')
+                end
+            }
+        }
+    })
 
-print("Name: " .. FormatAnimalName("a_c_deer"))
+    lib.showContext('hunter_sell_menu')
+end)
 
-function NotifyKill(animal)
-    TriggerServerEvent("hunt:notifyKill", animal)
+function DrawText3D(x, y, z, text)
+    local onScreen, _x, _y = World3dToScreen2d(x, y, z)
+    SetTextScale(0.35, 0.35)
+    SetTextFont(4)
+    SetTextProportional(1)
+    SetTextEntry("STRING")
+    SetTextCentre(1)
+    AddTextComponentString(text)
+    DrawText(_x, _y)
+    local factor = (string.len(text)) / 370
+    DrawRect(_x, _y + 0.0125, 0.015 + factor, 0.03, 0, 0, 0, 75)
 end
-
-if CanHunt() then
-    -- Hunt starten
-    StartCooldown()
-else
-    print("Warte, bevor du erneut jagen kannst.")
-end
-
-print("Cooldown ist gesetzt auf: " .. HUNT_COOLDOWN .. " Sekunden")
-
-ShowProgress("Tier wird verarbeitet...", 5)
-
-GrantLoot("deer") -- Beispiel
