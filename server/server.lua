@@ -1,21 +1,107 @@
 -- server/server.lua
 
-RegisterCommand("huntdebug", function(source, args, raw)
-    local src = source
-    TriggerClientEvent("hunter:client:debugInfo", src)
-end, true)
+local db = require("server.database_handler")
 
+-- Spieler-Events
 AddEventHandler("playerDropped", function(reason)
     local src = source
     print(("Player %s left the server (%s)"):format(src, reason))
 end)
 
+-- Debug-Command
+RegisterCommand("huntdebug", function(source, args, raw)
+    local src = source
+    TriggerClientEvent("hunter:client:debugInfo", src)
+end, true)
+
+-- Verkauf loggen
 RegisterNetEvent("hunter:server:logSell", function(item, price)
     local src = source
     print(("Player %s sold %s for $%s"):format(src, item, price))
 end)
 
--- Missionen laden (falls verwendet)
+-- Sound an Client senden
+RegisterNetEvent("hunt:playSound")
+AddEventHandler("hunt:playSound", function(soundName)
+    TriggerClientEvent("hunt:playClientSound", source, soundName)
+end)
+
+-- Tier getötet
+RegisterNetEvent("hunter:animalKilled", function(animalType, reward, dropItem)
+    local src = source
+    if db and db.saveKill then
+        db.saveKill(src, animalType, reward, dropItem)
+    else
+        print("[Fehler] DB-Modul nicht geladen.")
+    end
+
+    -- Geld & XP geben
+    local xPlayer = ESX.GetPlayerFromId(src)
+    if xPlayer then
+        xPlayer.addMoney(reward)
+        TriggerEvent("hunter:addXP", 10)
+        print(("Spieler %s erhielt $%s für %s"):format(src, reward, animalType))
+    end
+end)
+
+-- Einzelverkauf
+RegisterNetEvent('hunter:sell')
+AddEventHandler('hunter:sell', function(animal)
+    local src = source
+    local xPlayer = ESX.GetPlayerFromId(src)
+    local config = Config.Rewards[animal]
+
+    if xPlayer and config then
+        local count = xPlayer.getInventoryItem(config).count or 0
+        local price = Config.AnimalRewards[animal] or 100
+
+        if count > 0 then
+            xPlayer.removeInventoryItem(config, 1)
+            xPlayer.addMoney(price)
+            TriggerEvent("hunter:server:logSell", config, price)
+        else
+            print(("Spieler %s hat kein %s"):format(src, config))
+        end
+    else
+        print("[Fehler] Verkauf fehlgeschlagen (ESX oder Config fehlerhaft)")
+    end
+end)
+
+-- Alles verkaufen
+RegisterNetEvent('hunter:sellAll')
+AddEventHandler('hunter:sellAll', function()
+    local src = source
+    local xPlayer = ESX.GetPlayerFromId(src)
+    local total = 0
+
+    if xPlayer then
+        for animal, item in pairs(Config.Rewards) do
+            local amount = xPlayer.getInventoryItem(item).count or 0
+            local price = Config.AnimalRewards[animal] or 100
+
+            if amount > 0 then
+                xPlayer.removeInventoryItem(item, amount)
+                total += (amount * price)
+            end
+        end
+
+        if total > 0 then
+            xPlayer.addMoney(total)
+            print(("Spieler %s hat für %s$ verkauft"):format(src, total))
+        else
+            print(("Spieler %s hatte nichts zu verkaufen"):format(src))
+        end
+    else
+        print("[Fehler] Spieler nicht gefunden (ESX)")
+    end
+end)
+
+-- Admin-Spawnbefehl (Demo)
+RegisterCommand("startHunt", function(source)
+    SpawnRandomAnimal()
+end, false)
+
+-- Missionen laden
 local missionFiles = {
     'server/missions/mission-01.lua',
     'server/missions/mission-02.lua',
@@ -36,83 +122,3 @@ for _, file in ipairs(missionFiles) do
     print("Lade Mission:", file)
     dofile(file)
 end
-
-local db = require("server.database_handler")
-
-RegisterNetEvent("hunter:animalKilled", function(animalType, reward, dropItem)
-    local src = source
-    if db and db.saveKill then
-        db.saveKill(src, animalType, reward, dropItem)
-    else
-        print("[Fehler] DB-Modul nicht geladen.")
-    end
-end)
-
-RegisterNetEvent("hunt:playSound")
-AddEventHandler("hunt:playSound", function(soundName)
-    TriggerClientEvent("hunt:playClientSound", source, soundName)
-end)
-
-RegisterCommand("startHunt", function(source)
-    SpawnRandomAnimal()
-end, false)
-
--- Verkauf einzelner Tiere
-RegisterServerEvent('hunter:sell')
-AddEventHandler('hunter:sell', function(animal)
-    local src = source
-    local price = 0
-
-    if animal == 'deer' then
-        price = 100
-    elseif animal == 'boar' then
-        price = 150
-    end
-
-    if price > 0 then
-        local xPlayer = ESX.GetPlayerFromId(src)
-        if xPlayer then
-            xPlayer.addMoney(price)
-            print(("Spieler %s hat %s verkauft und %s$ erhalten"):format(src, animal, price))
-        else
-            print(("[Fehler] Spieler %s konnte nicht über ESX geladen werden."):format(src))
-        end
-    else
-        print(("[Warnung] Tier %s hat keinen festgelegten Preis."):format(tostring(animal)))
-    end
-end)
-
--- Verkauf aller gesammelten Items (Reh/Wildschwein)
-RegisterServerEvent('hunter:sellAll')
-AddEventHandler('hunter:sellAll', function()
-    local src = source
-    local xPlayer = ESX.GetPlayerFromId(src)
-    local total = 0
-
-    if xPlayer then
-        local deerCount = xPlayer.getInventoryItem('deer_pelt').count or 0
-        local boarCount = xPlayer.getInventoryItem('boar_pelt').count or 0
-
-        local deerPrice = 100
-        local boarPrice = 150
-
-        if deerCount > 0 then
-            total = total + (deerCount * deerPrice)
-            xPlayer.removeInventoryItem('deer_pelt', deerCount)
-        end
-
-        if boarCount > 0 then
-            total = total + (boarCount * boarPrice)
-            xPlayer.removeInventoryItem('boar_pelt', boarCount)
-        end
-
-        if total > 0 then
-            xPlayer.addMoney(total)
-            print(("Spieler %s hat alles verkauft und %s$ erhalten"):format(src, total))
-        else
-            print(("Spieler %s hatte nichts zu verkaufen"):format(src))
-        end
-    else
-        print("[Fehler] ESX-Spieler konnte nicht geladen werden.")
-    end
-end)
